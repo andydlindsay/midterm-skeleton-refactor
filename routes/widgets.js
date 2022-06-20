@@ -7,15 +7,25 @@
 
 const express = require('express');
 const router  = express.Router();
-const db = require('../db/connect');
+const widgetQueries = require('../db/queries/widget-queries');
 
-router.get("/", (req, res) => {
-  let query = `SELECT * FROM widgets`;
-  console.log(query);
-  db.query(query)
-    .then(data => {
-      const widgets = data.rows;
+router.get('/', (req, res) => {
+  widgetQueries.getWidgets()
+    .then(widgets => {
       res.json({ widgets });
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ error: err.message });
+    });
+});
+
+router.get('/:id', (req, res) => {
+  const widgetId = req.params.id;
+  widgetQueries.getWidgetById(widgetId)
+    .then(widget => {
+      res.json({ widget });
     })
     .catch(err => {
       res
